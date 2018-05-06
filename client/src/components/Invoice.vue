@@ -1,44 +1,48 @@
 <template>
-  <div class="uk-container uk-container-expand">
+  <div>
     <h2>Invoice {{ +$route.params.id ? ('#' + $route.params.id) : 'create'}}</h2>
     <hr>
-    <label for="customer">
-      Customer:
-    </label>
-    <select class="uk-select uk-width-1-1" name="customer" id="customer"
-            v-model="selectedCustomer"
-            v-on:change="customerHandler"
-            ref="customerSelector">
-      <option disabled value="">Check customer</option>
-      <option v-for="item in customers" v-bind:value="{id: item.id, name: item.name}"> {{item.name}}</option>
-    </select>
-    <table class="uk-table uk-table-striped uk-table-divider" v-if="invoiceCreate">
-      <tr>
-        <td colspan="2">
-          <select class="uk-select uk-width-1-1" name="product" id="product"
-                  v-model="selectedProducts">
-            <option disabled value="">Check product</option>
-            <option v-for="item in productsFiltered"
-                    v-bind:value="{id: item.id, name: item.name, price: item.price}">{{item.name}}</option>
-          </select>
-        </td>
-        <td>
-          <button class="uk-button uk-button-default uk-width-1-1"
-                  v-on:click="addItem"
-                  v-if="Object.keys(selectedProducts).length !== 0">
-            <span class="uk-flex uk-flex-middle uk-flex-center">
-              <svg class="uk-icon uk-margin-small-right">
-                <use xlink:href="#add"></use>
-              </svg>
+    <div class="mb-3">
+      <label for="customer">
+        Customer:
+      </label>
+      <select class="form-control" name="customer" id="customer"
+              v-model="selectedCustomer"
+              v-on:change="customerHandler"
+              ref="customerSelector">
+        <option disabled value="">Check customer</option>
+        <option v-for="item in customers" v-bind:value="{id: item.id, name: item.name}"> {{item.name}}</option>
+      </select>
+    </div>
+    <table class="table table-striped table-bordered" v-if="invoiceCreate">
+      <thead class="table-active">
+        <tr>
+          <th colspan="2">
+            <select class="form-control" name="product" id="product"
+                    v-model="selectedProducts">
+              <option disabled value="">Check product</option>
+              <option v-for="item in productsFiltered"
+                      v-bind:value="{id: item.id, name: item.name, price: item.price}">{{item.name}}</option>
+            </select>
+          </th>
+          <th>
+            <button class="btn btn-light border-dark btn-block"
+                    v-on:click="addItem"
+                    v-if="Object.keys(selectedProducts).length !== 0">
+              <span class="d-flex flex-row align-items-center justify-content-center">
+                <svg class="mr-1">
+                  <use xlink:href="#add"></use>
+                </svg>
+                Add product
+              </span>
+            </button>
+            <button class="btn btn-light border-dark btn-block"
+                    v-else disabled>
               Add product
-            </span>
-          </button>
-          <button class="uk-button uk-button-default uk-width-1-1"
-                  v-else disabled>
-            Add product
-          </button>
-        </td>
-      </tr>
+            </button>
+          </th>
+        </tr>
+      </thead>
       <tbody v-if="invoiceItems.length === 0">
       <tr>
         <td colspan="3">
@@ -46,25 +50,34 @@
         </td>
       </tr>
       </tbody>
-      <tbody v-else v-for="item in invoiceItems">
-        <invoice-item v-bind:item="item"
-                      v-bind:invoice_id="invoice.id"
-                      v-on:deletedItem="deleteItemHandler"
-                      v-on:changedQuantity="changeQuantityHandler">
-        </invoice-item>
+      <tbody v-else >
+      <tr>
+        <!--for striped temp-->
+      </tr>
+          <invoice-item v-for="item in invoiceItems"
+                        v-bind:item="item"
+                        v-bind:invoice_id="invoice.id"
+                        v-on:deletedItem="deleteItemHandler"
+                        v-on:changedQuantity="changeQuantityHandler">
+          </invoice-item>
       </tbody>
       <tr>
         <td colspan="2">
-          <p class="uk-text-right uk-text-bold"> Discount: </p>
+          <p class="font-weight-bold text-right"> Discount: </p>
         </td>
-        <td class="uk-width-medium">
-          <input type="number" min="0" step="1" class="uk-input"
-                 v-model.number="discount">
+        <td>
+          <div class="input-group ">
+            <input type="number" min="0" step="1" class="form-control" id="discount"
+                   v-model.number="discount">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">%</span>
+            </div>
+          </div>
         </td>
       </tr>
       <tr>
         <td colspan="3">
-          <p class="uk-text-right uk-text-bold">
+          <p class="font-weight-bold text-right">
             Total: ${{total}}
           </p>
         </td>
@@ -126,7 +139,7 @@
           },
           body: JSON.stringify(newItem)
         })
-          .then( res => res.status === 200 ? res.json() : null )
+          .then( res => res.status === 201 ? res.json() : null )
           .then( json => {
             const newItem = {
               id: json.id,
@@ -245,9 +258,9 @@
               this.invoice = json;
               this.invoiceCreate = true;
               this.discount = json.discount;
+              // ref + selectedIndex is not reactive. Don't work
               for(const customer of this.customers){
                 if( customer.id === this.invoice.customer_id){
-                  // ref + selectedIndex is not reactive. Don't work
                   this.selectedCustomer = {
                     id: customer.id,
                     name: customer.name
@@ -293,4 +306,5 @@
     width: 15px;
     height: 15px;
   }
+
 </style>

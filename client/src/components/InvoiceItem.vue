@@ -1,19 +1,21 @@
 <template>
   <tr>
-    <td class="uk-table-middle">
-      {{item.name}}
-      <button class="uk-button-default uk-icon-link red-icon" v-on:click="deleteItem">
-        <svg class="uk-icon">
-          <use xlink:href="#garbage"></use>
-        </svg>
-      </button>
+    <td class="w-50">
+      <div class="d-flex align-items-center">
+        {{item.name}}
+        <button class="btn btn-link red-icon ml-1" v-on:click="deleteItem">
+          <svg class="uk-icon">
+            <use xlink:href="#garbage"></use>
+          </svg>
+        </button>
+      </div>
     </td>
-    <td class="uk-width-medium">
-      <input type="number" class="uk-input"
+    <td class="w-10">
+      <input type="number" class="form-control"
              v-bind:value="item.quantity"
              v-on:change="quantityHandler">
     </td>
-    <td class="uk-text-right">
+    <td class="w-10 text-right">
       $ {{ item.total }}
     </td>
   </tr>
@@ -86,7 +88,11 @@
     fill: red;
   }
   svg {
-    width: 15px;
-    height: 15px;
+    width: 18px;
+    height: 18px;
+  }
+  .w-10 {
+    width: 10%;
+    min-width: 80px;
   }
 </style>

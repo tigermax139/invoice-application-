@@ -2,9 +2,8 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
-// UIkit
-import 'uikit/dist/css/uikit.min.css';
-import 'uikit/dist/js/uikit.min';
+//bootstrap
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 //components
 import App from './App.vue';

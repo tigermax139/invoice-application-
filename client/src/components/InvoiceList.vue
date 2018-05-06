@@ -1,8 +1,8 @@
 <template>
-  <div class="uk-container uk-container-expand uk-margin-medium-top">
-    <div class="uk-flex uk-flex-between flex-start">
-      <h2 class="uk-h2">List of invoices</h2>
-      <router-link v-bind:to="{name: 'createInvoice'}" class="uk-button uk-button-primary">
+  <div class="container-fluid">
+    <div class="row align-items-center justify-content-between">
+      <h2 class="h2">List of invoices</h2>
+      <router-link v-bind:to="{name: 'createInvoice'}" class="btn-success rounded p-2 top">
         New invoice
       </router-link>
     </div>
@@ -10,7 +10,7 @@
     <div class="uk-background-muted" v-if="invoices.length === 0">
       <h4 class="uk-h4 uk-text-center"> No invoices Yet...</h4>
     </div>
-    <table v-else class="uk-table uk-table-striped uk-table-divider">
+    <table v-else class="table table-striped table-bordered table-hover">
       <thead>
         <tr>
           <th class="uk-width-2-5 uk-text-bold">#</th>
