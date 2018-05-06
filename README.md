@@ -1,5 +1,5 @@
 # invoice-application-
-simple invoice application on Vue.js + UI-kit
+simple invoice application on Vue.js + Bootstrap 4
 
 ## START
 ###1
