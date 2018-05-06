@@ -180,7 +180,7 @@ app.route('/api/invoices')
             total: req.body.total
         };
         Invoice.create(newInvoice).then( function (response) {
-            res.json(response);
+            res.status(201).json(response);
         }).catch( function (reason) {
             console.log(reason);
         });
@@ -189,7 +189,7 @@ app.route('/api/invoices')
 app.route('/api/invoices/:invoice_id')
     .get(function (req, res) {
         Invoice.findById(req.params.invoice_id).then(function (invoice) {
-                res.json(invoice);
+                res.status(200).json(invoice);
         }).catch( function (reason) {
             console.log(reason);
         });
@@ -230,7 +230,7 @@ app.route('/api/invoices/:invoice_id/items')
                 invoice_id: req.params.invoice_id
             }
         }).then( function (result) {
-            res.json(result);
+            res.status(200).json(result);
         }).catch( function (reason) {
             console.log(reason);
         });
@@ -243,7 +243,7 @@ app.route('/api/invoices/:invoice_id/items')
         };
         InvoiceItem.create(newItem)
             .then( function ( response) {
-                res.json(response);
+                res.status(201).json(response);
             })
             .catch( function (reason) {
                 console.log(reason);
@@ -254,7 +254,7 @@ app.route('/api/invoices/:invoice_id/items/:id')
     .get(function (req, res) {
         InvoiceItem.findById(req.params.id)
             .then( function (item) {
-                res.json(item);
+                res.status(200).json(item);
             })
             .catch( function (reason) {
                 console.log(reason);

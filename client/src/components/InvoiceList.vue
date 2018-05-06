@@ -19,23 +19,7 @@
           <th class="uk-text-bold">Last Update</th>
         </tr>
       </thead>
-      <tbody v-for="item in invoicesSortable">
-        <tr v-on:click="accordionHandler">
-          <td colspan="4" class="uk-text-bold uk-table-middle">
-              <svg class="uk-icon uk-margin-small-right">
-                <use xlink:href="#remove"></use>
-              </svg>
-              {{ getCustomerName(item.customer_id)}}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <router-link :to="{name: 'editInvoice', params: {id: item.id}}"> Invoice #{{item.id}} </router-link>
-          </td>
-          <td> {{item.total}} </td>
-          <td> {{ getDate(item.createdAt)}}</td>
-          <td> {{ getDate(item.updatedAt)}}</td>
-        </tr>
+      <tbody v-html="renderList">
       </tbody>
     </table>
   </div>
@@ -54,17 +38,42 @@
     },
     computed: {
       invoicesSortable: function () {
-       return this.invoices.sort( (a, b) => a.customer_id - b.customer_id);
+       return this.invoices.reduce( (acc, elem) =>
+          acc.has(elem.customer_id)
+          ? acc.set(elem.customer_id, [...acc.get(elem.customer_id), elem])
+          : acc.set(elem.customer_id, [elem])
+       , new Map);
+      },
+      renderList: function () {
+        // raw js render because vue.js cycle not correct work with Map
+        let html = '';
+        for( const item of this.invoicesSortable){
+          html = html + `
+          <tr>
+          <td colspan="4" class="uk-text-bold uk-table-middle">
+              <svg style="width: 15px; height: 15px">
+                <use xlink:href="#remove"></use>
+              </svg>
+              ${this.getCustomerName(item[0])}
+          </td>
+        </tr>`;
+          for( const elem of item[1]){
+            html = html + `
+            <tr>
+              <td>
+                <router-link :to="{name: 'editInvoice', params: {id: ${elem.id}}"> Invoice #${elem.id} </router-link>
+              </td>
+              <td> ${elem.total} </td>
+              <td> ${ this.getDate(elem.createdAt)}</td>
+              <td> ${ this.getDate(elem.updatedAt)}</td>
+            </tr>
+            `;
+          }
+        }
+        return html;
       }
     },
     methods: {
-      accordionHandler: function (evt) {
-        if (!evt.currentTarget.nextElementSibling.classList.contains('uk-hidden')) {
-          evt.currentTarget.nextElementSibling.classList.add('uk-hidden');
-        } else {
-          evt.currentTarget.nextElementSibling.classList.remove('uk-hidden');
-        }
-      },
       getCustomerName: function (customer_id) {
         let customerName = 'Name is not defined';
         for(const customer of this.customers) {
@@ -92,12 +101,5 @@
 </script>
 
 <style scoped>
-  .flex-start {
-    align-items: start;
-  }
-  svg {
-    width: 15px;
-    height: 15px;
-  }
 </style>
 
