@@ -241,12 +241,23 @@
         fetch(`${config.apiURL}/api/invoices/${id}`, {method: 'get'})
           .then( res => res.status === 200 ? res.json() : null)
           .then( json => {
-            this.invoice = json;
-            this.invoiceCreate = true;
-            this.discount = json.discount;
-            // @todo don"t forget delete me
-            document.querySelector('#customer').selectedIndex = this.invoice.customer_id;
-            console.log(this.$refs.customerSelector.selectedIndex);
+            if( json !== null){
+              this.invoice = json;
+              this.invoiceCreate = true;
+              this.discount = json.discount;
+              for(const customer of this.customers){
+                if( customer.id === this.invoice.customer_id){
+                  // ref + selectedIndex is not reactive. Don't work
+                  this.selectedCustomer = {
+                    id: customer.id,
+                    name: customer.name
+                  };
+                  break;
+                }
+              }
+            }else {
+              this.$router.push({name: 'createInvoice'});
+            }
           })
           .catch( err => console.log(err));
         fetch(`${config.apiURL}/api/invoices/${id}/items`, {method: 'get'})
