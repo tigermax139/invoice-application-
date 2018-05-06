@@ -2,9 +2,11 @@
   <tr>
     <td>
       {{item.name}}
-      <button class="uk-icon-link red-icon" v-on:click="deleteItem">
-      <i class="uk-icon" uk-icon="trash">x</i>
-    </button>
+      <button class="uk-button-default uk-icon-link red-icon" v-on:click="deleteItem">
+        <svg class="uk-icon">
+          <use xlink:href="#garbage"></use>
+        </svg>
+      </button>
     </td>
     <td class="uk-width-medium">
       <input type="number" class="uk-input"
@@ -76,7 +78,15 @@
 </script>
 
 <style scoped>
-  .red-icon {
-    stroke: red;
+  .red-icon svg{
+    fill: #A74544;
+  }
+  .red-icon:hover,
+  .red-icon:focus {
+    fill: red;
+  }
+  svg {
+    width: 15px;
+    height: 15px;
   }
 </style>

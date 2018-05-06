@@ -21,8 +21,14 @@
       </thead>
       <tbody v-for="item in invoicesSortable">
         <tr v-on:click="accordionHandler">
-          <td colspan="4" class="uk-text-bold"> {{ getCustomerName(item.customer_id)}}
-            <span uk-icon="minus"></span></td>
+          <td colspan="4" class="uk-text-bold">
+            <div class="uk-flex uk-flex-middle">
+              <svg class="uk-icon uk-margin-small-right">
+                <use xlink:href="#remove"></use>
+              </svg>
+              {{ getCustomerName(item.customer_id)}}
+            </div>
+          </td>
         </tr>
         <tr>
           <td>
@@ -57,10 +63,8 @@
       accordionHandler: function (evt) {
         if (!evt.currentTarget.nextElementSibling.classList.contains('uk-hidden')) {
           evt.currentTarget.nextElementSibling.classList.add('uk-hidden');
-          //evt.target.setAttribute('uk-icon', 'plus');
         } else {
           evt.currentTarget.nextElementSibling.classList.remove('uk-hidden');
-          //evt.target.setAttribute('uk-icon', 'minus');
         }
       },
       getCustomerName: function (customer_id) {
@@ -78,22 +82,12 @@
     },
     beforeMount: function () {
       fetch(`${config.apiURL}/api/invoices`, {method: 'get'})
-        .then( res => {
-          if(res.status === 200){
-            res.json().then( json => {
-              this.invoices = json;
-            })
-          }
-        })
+        .then( res => res.status === 200 ? res.json() : null)
+        .then( json => this.invoices = json)
         .catch( err => console.log(err));
       fetch(`${config.apiURL}/api/customers`, {method: 'get'})
-        .then(res => {
-          if (res.status === 200) {
-            res.json().then(json => {
-              this.customers = json;
-            })
-          }
-        })
+        .then(res => res.status === 200 ? res.json() : null)
+        .then(json => this.customers = json)
         .catch( err => console.log(err));
     }
   }
@@ -103,4 +97,9 @@
   .flex-start {
     align-items: start;
   }
+  svg {
+    width: 15px;
+    height: 15px;
+  }
 </style>
+

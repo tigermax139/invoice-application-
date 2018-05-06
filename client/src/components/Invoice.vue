@@ -11,7 +11,7 @@
       <option disabled value="">Check customer</option>
       <option v-for="item in customers" v-bind:value="{id: item.id}"> {{item.name}}</option>
     </select>
-    <table class="uk-table uk-table-striped uk-table-divider">
+    <table class="uk-table uk-table-striped uk-table-divider" v-if="invoiceCreate">
       <tr>
         <td colspan="2">
           <select class="uk-select uk-width-1-1" name="product" id="product"
@@ -25,12 +25,15 @@
           <button class="uk-button uk-button-default uk-width-1-1"
                   v-on:click="addItem"
                   v-if="Object.keys(selectedProducts).length !== 0">
-            <span class="uk-icon" uk-icon="icon: plus"></span>
-            Add product
+            <span class="uk-flex uk-flex-middle uk-flex-center">
+              <svg class="uk-icon uk-margin-small-right">
+                <use xlink:href="#add"></use>
+              </svg>
+              Add product
+            </span>
           </button>
           <button class="uk-button uk-button-default uk-width-1-1"
                   v-else disabled>
-            <span class="uk-icon" uk-icon="icon: plus"></span>
             Add product
           </button>
         </td>
@@ -46,7 +49,8 @@
         <invoice-item v-bind:item="item"
                       v-bind:invoice_id="invoice.id"
                       v-on:deletedItem="deleteItemHandler"
-                      v-on:changedQuantity="changeQuantityHandler"></invoice-item>
+                      v-on:changedQuantity="changeQuantityHandler">
+        </invoice-item>
       </tbody>
       <tr>
         <td colspan="2">
@@ -101,7 +105,6 @@
          const sum =  this.invoiceItems.reduce( (sum, elem) => {
             return sum + ( Number(elem.quantity) * Number(elem.price));
           }, 0);
-
          return Number((sum - sum * (this.discount/100)).toFixed(2));
         }
         return 0;
@@ -122,20 +125,17 @@
           },
           body: JSON.stringify(newItem)
         })
-          .then( res => {
-            if(res.status === 200) {
-              res.json().then( json => {
-                const newItem = {
-                  id: json.id,
-                  name: this.selectedProducts.name,
-                  quantity: 1,
-                  price: this.selectedProducts.price,
-                  total: this.selectedProducts.price
-                };
-                this.invoiceItems.push(newItem);
-                this.selectedProducts = '';
-              });
-            }
+          .then( res => res.status === 200 ? res.json() : null )
+          .then( json => {
+            const newItem = {
+              id: json.id,
+              name: this.selectedProducts.name,
+              quantity: 1,
+              price: this.selectedProducts.price,
+              total: this.selectedProducts.price
+            };
+            this.invoiceItems.push(newItem);
+            this.selectedProducts = '';
           })
           .catch( err => consple.log(err));
       },
@@ -198,8 +198,9 @@
               mode: 'cors',
               body: JSON.stringify({customer_id: this.selectedCustomer.id})
             })
-            .then( res => {
-              res.json().then( json => { this.invoice = json; });
+            .then( res => res.json())
+            .then( json => {
+              this.invoice = json;
               this.invoiceCreate = true;
             })
             .catch( err => consple.log(err));
@@ -220,22 +221,12 @@
     },
     beforeMount: function () {
       fetch(`${config.apiURL}/api/customers`, {method: 'get'})
-        .then( res => {
-          if(res.status === 200){
-            res.json().then( json => {
-              this.customers = json;
-            });
-          }
-        })
+        .then( res => res.status === 200 ? res.json() : null)
+        .then( json => this.customers = json)
         .catch( err => consple.log(err));
       fetch(`${config.apiURL}/api/products`, {method: 'get'})
-        .then( res => {
-          if(res.status === 200){
-            res.json().then( json => {
-              this.products = json;
-            });
-          }
-        })
+        .then( res => res.status === 200 ? res.json() : null)
+        .then( json => this.products = json)
         .catch( err => consple.log(err));
     }
     // ,
@@ -250,4 +241,8 @@
 </script>
 
 <style scoped>
+  svg {
+    width: 15px;
+    height: 15px;
+  }
 </style>
