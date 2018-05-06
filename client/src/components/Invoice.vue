@@ -1,15 +1,16 @@
 <template>
   <div class="uk-container uk-container-expand">
-    <h2>Invoice create</h2>
+    <h2>Invoice {{ +$route.params.id ? ('#' + $route.params.id) : 'create'}}</h2>
     <hr>
     <label for="customer">
       Customer:
     </label>
     <select class="uk-select uk-width-1-1" name="customer" id="customer"
             v-model="selectedCustomer"
-            v-on:change="customerHandler">
+            v-on:change="customerHandler"
+            ref="customerSelector">
       <option disabled value="">Check customer</option>
-      <option v-for="item in customers" v-bind:value="{id: item.id}"> {{item.name}}</option>
+      <option v-for="item in customers" v-bind:value="{id: item.id, name: item.name}"> {{item.name}}</option>
     </select>
     <table class="uk-table uk-table-striped uk-table-divider" v-if="invoiceCreate">
       <tr>
@@ -54,7 +55,7 @@
       </tbody>
       <tr>
         <td colspan="2">
-          <p class="uk-text-right uk-text-bold"> Discount </p>
+          <p class="uk-text-right uk-text-bold"> Discount: </p>
         </td>
         <td class="uk-width-medium">
           <input type="number" min="0" step="1" class="uk-input"
@@ -196,11 +197,15 @@
                 'Content-Type': 'application/json'
               },
               mode: 'cors',
-              body: JSON.stringify({customer_id: this.selectedCustomer.id})
+              body: JSON.stringify({
+                customer_id: this.selectedCustomer.id,
+                discount: 0,
+                total: 0
+              })
             })
             .then( res => res.json())
             .then( json => {
-              this.invoice = json;
+              this.invoice = Object.assign({},json);
               this.invoiceCreate = true;
             })
             .catch( err => consple.log(err));
@@ -223,20 +228,52 @@
       fetch(`${config.apiURL}/api/customers`, {method: 'get'})
         .then( res => res.status === 200 ? res.json() : null)
         .then( json => this.customers = json)
-        .catch( err => consple.log(err));
+        .catch( err => console.log(err));
       fetch(`${config.apiURL}/api/products`, {method: 'get'})
         .then( res => res.status === 200 ? res.json() : null)
         .then( json => this.products = json)
-        .catch( err => consple.log(err));
+        .catch( err => console.log(err));
+    },
+    mounted: function () {
+      // for editInvoice page
+      if( +this.$route.params.id){
+        const id = Number(this.$route.params.id);
+        fetch(`${config.apiURL}/api/invoices/${id}`, {method: 'get'})
+          .then( res => res.status === 200 ? res.json() : null)
+          .then( json => {
+            this.invoice = json;
+            this.invoiceCreate = true;
+            this.discount = json.discount;
+            // @todo don"t forget delete me
+            document.querySelector('#customer').selectedIndex = this.invoice.customer_id;
+            console.log(this.$refs.customerSelector.selectedIndex);
+          })
+          .catch( err => console.log(err));
+        fetch(`${config.apiURL}/api/invoices/${id}/items`, {method: 'get'})
+          .then( res => res.status === 200 ? res.json() : null)
+          .then( json => {
+            for( const item of json) {
+              let newItem  = {
+                id: item.id,
+                name: '',
+                quantity: item.quantity,
+                price: 0,
+                total: 0
+              };
+              for(const product of this.products){
+                if(product.id === item.product_id) {
+                  newItem.name = product.name;
+                  newItem.price = product.price;
+                  newItem.total = Number((product.price * item.quantity).toFixed(2));
+                  break;
+                }
+              }
+              this.invoiceItems.push(newItem);
+            }
+          })
+          .catch( err => console.log(err));
+      }
     }
-    // ,
-    // beforeCreate: function () {
-    //   fetch(`${config.apiURL}/api/invoices`, {method: 'post'})
-    //     .then( res => {
-    //         res.json().then( json => { this.invoice = json; });
-    //     })
-    //     .catch( err => console.log(err));
-    // }
   }
 </script>
 

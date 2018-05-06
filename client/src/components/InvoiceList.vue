@@ -2,7 +2,7 @@
   <div class="uk-container uk-container-expand uk-margin-medium-top">
     <div class="uk-flex uk-flex-between flex-start">
       <h2 class="uk-h2">List of invoices</h2>
-      <router-link to="/invoice" class="uk-button uk-button-primary">
+      <router-link v-bind:to="{name: 'createInvoice'}" class="uk-button uk-button-primary">
         New invoice
       </router-link>
     </div>
@@ -21,18 +21,16 @@
       </thead>
       <tbody v-for="item in invoicesSortable">
         <tr v-on:click="accordionHandler">
-          <td colspan="4" class="uk-text-bold">
-            <div class="uk-flex uk-flex-middle">
+          <td colspan="4" class="uk-text-bold uk-table-middle">
               <svg class="uk-icon uk-margin-small-right">
                 <use xlink:href="#remove"></use>
               </svg>
               {{ getCustomerName(item.customer_id)}}
-            </div>
           </td>
         </tr>
         <tr>
           <td>
-            <router-link :to="{name: 'invoice', params: {id: item.id}}"> Invoice #{{item.id}} </router-link>
+            <router-link :to="{name: 'editInvoice', params: {id: item.id}}"> Invoice #{{item.id}} </router-link>
           </td>
           <td> {{item.total}} </td>
           <td> {{ getDate(item.createdAt)}}</td>

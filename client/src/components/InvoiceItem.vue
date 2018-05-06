@@ -1,6 +1,6 @@
 <template>
   <tr>
-    <td>
+    <td class="uk-table-middle">
       {{item.name}}
       <button class="uk-button-default uk-icon-link red-icon" v-on:click="deleteItem">
         <svg class="uk-icon">
@@ -13,8 +13,8 @@
              v-bind:value="item.quantity"
              v-on:change="quantityHandler">
     </td>
-    <td>
-      {{ item.total }}
+    <td class="uk-text-right">
+      $ {{ item.total }}
     </td>
   </tr>
 </template>
